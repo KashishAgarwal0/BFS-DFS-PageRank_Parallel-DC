@@ -4,7 +4,7 @@
 #define DAMPING 0.85
 #define MAX_ITERS 20
 
-_global_ void pagerank_kernel(int *row_ptr, int *col_ind, float *ranks_curr, float *ranks_next, int num_nodes) {
+__global__ void pagerank_kernel(int *row_ptr, int *col_ind, float *ranks_curr, float *ranks_next, int num_nodes) {
     int node = blockIdx.x * blockDim.x + threadIdx.x;
     
     if (node < num_nodes) {
@@ -21,14 +21,6 @@ _global_ void pagerank_kernel(int *row_ptr, int *col_ind, float *ranks_curr, flo
         }
     }
 }
-_global_ void add_teleportation(float *ranks_next, int num_nodes) {
-    int node = blockIdx.x * blockDim.x + threadIdx.x;
-    
-    if (node < num_nodes) {
-        ranks_next[node] += (1.0f - DAMPING) / num_nodes;
-    }
-}
-
 
 int main() {
     // Load CSR graph
@@ -83,7 +75,7 @@ int main() {
     cudaMemset(d_ranks_next, 0, num_nodes * sizeof(float));
 
     // Fill d_ranks_curr with init_rank
-    float h_init_ranks = (float)malloc(num_nodes * sizeof(float));
+    float *h_init_ranks = (float*)malloc(num_nodes * sizeof(float));
     for (int i = 0; i < num_nodes; i++) {
         h_init_ranks[i] = init_rank;
     }
@@ -124,7 +116,7 @@ int main() {
     cudaEventElapsedTime(&milliseconds, start, stop);
 
     // Copy results back
-    float h_ranks = (float)malloc(num_nodes * sizeof(float));
+    float *h_ranks = (float*)malloc(num_nodes * sizeof(float));
     cudaMemcpy(h_ranks, d_ranks_curr, num_nodes * sizeof(float), cudaMemcpyDeviceToHost);
 
     // Print first 10 ranks
