@@ -58,13 +58,15 @@ The goal is to leverage GPU acceleration via CUDA to significantly reduce comput
 
 # BFS (CPU vs GPU)
 
+![Comparison Graph](bfs.png)
 
 
 
 # DFS CPU vs GPU
+![Comparison Graph](dfs.png)
 
 #  PageRank CPU vs GPU
-
+![Comparison Graph](pagerank.png)
 
 # How to Run
 
